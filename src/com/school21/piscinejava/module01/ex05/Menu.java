@@ -10,9 +10,9 @@ import java.util.Scanner;
 import static java.lang.String.format;
 
 public class Menu {
-    private static final String ansiRed = "\u001B[31m";
-    private static final String ansiReset = "\u001B[0m";
-    private static final String ps1 = "-> ";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String PS1 = "-> ";
     private final TransactionsService transactionsService = new TransactionsService();
     private final Scanner scanner = new Scanner(System.in);
 
@@ -41,7 +41,7 @@ public class Menu {
                 for (int i = 0; i < menuActions.size(); ++i) {
                     System.out.printf("%d. %s%n", i + 1, menuActions.get(i).getDescription());
                 }
-                System.out.print(ps1);
+                System.out.print(PS1);
                 String[] args = extractArgs(scanner.nextLine());
                 if (args.length != 1) {
                     throw new MenuActionException(format("Error: too %s arguments", (args.length < 1) ? "few" : "many"));
@@ -52,15 +52,15 @@ public class Menu {
                 }
                 menuActions.get(idx - 1).execute();
             }catch (NumberFormatException ex) {
-                System.out.printf("%s%s%s%n", ansiRed, "Error: invalid number format", ansiReset);
+                System.out.printf("%s%s%s%n", ANSI_RED, "Error: invalid number format", ANSI_RESET);
             } catch (Exception ex) {
-                System.out.printf("%s%s%s%n", ansiRed, ex.getMessage(), ansiReset);
+                System.out.printf("%s%s%s%n", ANSI_RED, ex.getMessage(), ANSI_RESET);
             }
         }
     }
 
     public void addUserAction() {
-        System.out.printf("Enter a user name and a balance%n%s", ps1);
+        System.out.printf("Enter a user name and a balance%n%s", PS1);
         String[] args = extractArgs(scanner.nextLine());
         if (args.length != 2) {
             throw new MenuActionException(format("Error: too %s arguments", (args.length < 2) ? "few" : "many"));
@@ -70,7 +70,7 @@ public class Menu {
     }
 
     public void viewUserBalanceAction() {
-        System.out.printf("Enter a user ID%n%s", ps1);
+        System.out.printf("Enter a user ID%n%s", PS1);
         String[] args = extractArgs(scanner.nextLine());
         if (args.length != 1) {
             throw new MenuActionException(format("Error: too %s arguments", (args.length < 1) ? "few" : "many"));
@@ -82,7 +82,7 @@ public class Menu {
     }
 
     public void performTransferAction() {
-        System.out.printf("Enter a sender ID, a recipient ID, and a transfer amount%n%s", ps1);
+        System.out.printf("Enter a sender ID, a recipient ID, and a transfer amount%n%s", PS1);
         String[] args = extractArgs(scanner.nextLine());
         if (args.length != 3) {
             throw new MenuActionException(format("Error: too %s arguments", (args.length < 3) ? "few" : "many"));
@@ -95,7 +95,7 @@ public class Menu {
     }
 
     public void viewUserTransactionsAction() {
-        System.out.printf("Enter a user ID%n%s", ps1);
+        System.out.printf("Enter a user ID%n%s", PS1);
         String[] args = extractArgs(scanner.nextLine());
         if (args.length != 1) {
             throw new MenuActionException(format("Error: too %s arguments", (args.length < 1) ? "few" : "many"));
@@ -108,7 +108,7 @@ public class Menu {
     }
 
     public void removeTransferByIdAction() {
-        System.out.printf("Enter a user ID and a transfer ID%n%s", ps1);
+        System.out.printf("Enter a user ID and a transfer ID%n%s", PS1);
         String[] args = extractArgs(scanner.nextLine());
         if (args.length != 2) {
             throw new MenuActionException(format("Error: too %s arguments", (args.length < 2) ? "few" : "many"));
