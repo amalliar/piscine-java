@@ -2,11 +2,13 @@ package com.school21.piscinejava.module03.ex03;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -25,13 +27,19 @@ class DownloadRunnable implements Runnable {
     @Override
     public void run() {
         String fileName = url.substring(url.lastIndexOf("/") + 1);
-        System.out.printf("Thread-%d start download file %s%n", Thread.currentThread().getId(), fileName);
+        System.out.printf("Thread-%d: Start download file %s%n", Thread.currentThread().threadId(), fileName);
+        String filePath = downloadPath + FileSystems.getDefault().getSeparator() + fileName;
+        if (Files.exists(Path.of(filePath))) {
+            System.out.printf("Thread-%d: Warning! File %s already present in the system, skipping...%n",
+                    Thread.currentThread().threadId(), fileName);
+            return;
+        }
         try (FileOutputStream fileOS = new FileOutputStream(downloadPath + FileSystems.getDefault().getSeparator() + fileName)) {
-            ReadableByteChannel readChannel = Channels.newChannel(new URL(url).openStream());
+            ReadableByteChannel readChannel = Channels.newChannel(new URI(url).toURL().openStream());
             fileOS.getChannel().transferFrom(readChannel, 0, Long.MAX_VALUE);
-            System.out.printf("Thread-%d finish download file %s%n", Thread.currentThread().getId(), fileName);
-        } catch (IOException ex) {
-            System.out.printf("%sError: %s%s%n", Program.ANSI_RED, ex.getMessage(), Program.ANSI_RESET);
+            System.out.printf("Thread-%d: Finish download file %s%n", Thread.currentThread().threadId(), fileName);
+        } catch (IOException | URISyntaxException ex) {
+            System.out.printf("%sThread-%d: Error: %s%s%n", Program.ANSI_RED, Thread.currentThread().threadId(), ex.getMessage(), Program.ANSI_RESET);
         }
 
     }
@@ -45,9 +53,8 @@ public class Program {
 
     public static void main(String[] args) {
         parseArgs(args);
-        try {
+        try (ExecutorService service = Executors.newFixedThreadPool(threadsCount)) {
             List<String> filesUrls = Files.readAllLines(Paths.get("files_urls.txt"));
-            ExecutorService service = Executors.newFixedThreadPool(threadsCount);
             filesUrls.forEach(url -> service.execute(new DownloadRunnable(DOWNLOAD_PATH, url)));
             service.shutdown();
         } catch (IOException ex) {
